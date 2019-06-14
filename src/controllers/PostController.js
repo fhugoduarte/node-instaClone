@@ -12,16 +12,18 @@ module.exports = {
 
   async store(req, res) {
     const { author, place, description, hashtags } = req.body;
-    const { originalname: image } = req.files;
+
+    const file = req.files[0];
+    const { originalname: image } = file;
     const [name] = image.split(".");
     const fileName = `${name}.jpg`;
 
-    await sharp(req.file.path)
+    await sharp(file.path)
       .resize(500)
       .jpeg({ quality: 70 })
-      .toFile(path.resolve(req.file.destination, "resized", fileName));
+      .toFile(path.resolve(file.destination, "resized", fileName));
 
-    fs.unlinkSync(req.file.path);
+    fs.unlinkSync(file.path);
 
     const post = await Post.create({
       author,
